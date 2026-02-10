@@ -633,14 +633,27 @@ export function Prompt(props: PromptProps) {
     setStore("extmarkToPartIndex", new Map())
     props.onSubmit?.()
 
-    // temporary hack to make sure the message is sent
-    if (!props.sessionID)
-      setTimeout(() => {
-        route.navigate({
-          type: "session",
-          sessionID,
-        })
-      }, 50)
+    // [openralph] Wait for session to sync before navigating to avoid blank screen.
+    // The original 50ms timeout navigated before the session was synced, causing a rendering stall.
+    if (!props.sessionID) {
+      const waitForSessionAndNavigate = async () => {
+        const maxWait = 5000
+        const interval = 100
+        let waited = 0
+        while (waited < maxWait) {
+          const sessions = sync.data.session
+          if (sessions?.some((s: { id: string }) => s.id === sessionID)) {
+            route.navigate({ type: "session", sessionID })
+            return
+          }
+          await new Promise(r => setTimeout(r, interval))
+          waited += interval
+        }
+        // Fallback: navigate anyway after max wait
+        route.navigate({ type: "session", sessionID })
+      }
+      waitForSessionAndNavigate()
+    }
     input.clear()
   }
   const exit = useExit()
