@@ -22,8 +22,8 @@ export const { use: useRoute, provider: RouteProvider } = createSimpleContext({
       process.env["OPENCODE_ROUTE"]
         ? JSON.parse(process.env["OPENCODE_ROUTE"])
         : {
-            type: "home",
-          },
+          type: "home",
+        },
     )
 
     return {
@@ -31,7 +31,7 @@ export const { use: useRoute, provider: RouteProvider } = createSimpleContext({
         return store
       },
       navigate(route: Route) {
-        console.log("navigate", route)
+        console.error(`[openralph-diag] route.navigate called: ${JSON.stringify(route)} at ${Date.now()}`)
         setStore(route)
       },
     }
