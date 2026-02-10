@@ -13,6 +13,7 @@ import {
 } from "solid-js"
 import { Dynamic } from "solid-js/web"
 import path from "path"
+import { appendFileSync } from "fs"
 import { useRoute, useRouteData } from "@tui/context/route"
 import { useSync } from "@tui/context/sync"
 import { SplitBorder } from "@tui/component/border"
@@ -115,10 +116,10 @@ export function Session() {
   const kv = useKV()
   const { theme } = useTheme()
   const promptRef = usePromptRef()
-  console.error(`[openralph-diag] Session component MOUNTED for sessionID=${route.sessionID} at ${Date.now()}`)
+  try { appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] Session MOUNTED: sessionID=${route.sessionID}\n`) } catch { }
   const session = createMemo(() => {
     const s = sync.session.get(route.sessionID)
-    console.error(`[openralph-diag] session() memo evaluated: sessionID=${route.sessionID}, found=${!!s}, title=${s?.title ?? 'N/A'} at ${Date.now()}`)
+    try { appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] session() memo: sessionID=${route.sessionID}, found=${!!s}, title=${s?.title ?? 'N/A'}\n`) } catch { }
     return s
   })
   const children = createMemo(() => {
@@ -180,16 +181,16 @@ export function Session() {
   })
 
   createEffect(async () => {
-    console.error(`[openralph-diag] sync.session.sync(${route.sessionID}) STARTING at ${Date.now()}`)
+    try { appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] sync.session.sync(${route.sessionID}) STARTING\n`) } catch { }
     const syncStart = Date.now()
     await sync.session
       .sync(route.sessionID)
       .then(() => {
-        console.error(`[openralph-diag] sync.session.sync(${route.sessionID}) COMPLETED in ${Date.now() - syncStart}ms`)
+        try { appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] sync.session.sync(${route.sessionID}) COMPLETED in ${Date.now() - syncStart}ms\n`) } catch { }
         if (scroll) scroll.scrollBy(100_000)
       })
       .catch((e) => {
-        console.error(`[openralph-diag] sync.session.sync(${route.sessionID}) FAILED in ${Date.now() - syncStart}ms: ${e?.message}`)
+        try { appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] sync.session.sync(${route.sessionID}) FAILED in ${Date.now() - syncStart}ms: ${e?.message}\n`) } catch { }
         console.error(e)
         toast.show({
           message: `Session not found: ${route.sessionID}`,

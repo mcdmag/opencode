@@ -1,6 +1,9 @@
 import { createStore } from "solid-js/store"
 import { createSimpleContext } from "./helper"
 import type { PromptInfo } from "../component/prompt/history"
+import { appendFileSync } from "fs"
+
+const DIAG_LOG = "/tmp/openralph-debug.log"
 
 export type HomeRoute = {
   type: "home"
@@ -31,7 +34,7 @@ export const { use: useRoute, provider: RouteProvider } = createSimpleContext({
         return store
       },
       navigate(route: Route) {
-        console.error(`[openralph-diag] route.navigate called: ${JSON.stringify(route)} at ${Date.now()}`)
+        try { appendFileSync(DIAG_LOG, `[${new Date().toISOString()}] route.navigate: ${JSON.stringify(route)}\n`) } catch { }
         setStore(route)
       },
     }

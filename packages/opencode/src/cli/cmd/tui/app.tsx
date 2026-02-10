@@ -640,7 +640,7 @@ function App() {
   })
 
   sdk.event.on(TuiEvent.SessionSelect.type, (evt) => {
-    console.error(`[openralph-diag] SessionSelect event received: sessionID=${evt.properties.sessionID} at ${Date.now()}`)
+    try { require("fs").appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] SessionSelect: sessionID=${evt.properties.sessionID}\n`) } catch { }
     route.navigate({
       type: "session",
       sessionID: evt.properties.sessionID,
