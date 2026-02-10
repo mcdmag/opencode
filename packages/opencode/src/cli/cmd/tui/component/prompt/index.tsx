@@ -175,7 +175,6 @@ export function Prompt(props: PromptProps) {
         category: "Prompt",
         hidden: true,
         onSelect: (dialog) => {
-          if (!input.focused) return
           submit()
           dialog.clear()
         },
@@ -529,9 +528,9 @@ export function Prompt(props: PromptProps) {
     const sessionID = props.sessionID
       ? props.sessionID
       : await (async () => {
-          const sessionID = await sdk.client.session.create({}).then((x) => x.data!.id)
-          return sessionID
-        })()
+        const sessionID = await sdk.client.session.create({}).then((x) => x.data!.id)
+        return sessionID
+      })()
     const messageID = Identifier.ascending("message")
     let inputText = store.prompt.input
 
@@ -620,7 +619,7 @@ export function Prompt(props: PromptProps) {
             })),
           ],
         })
-        .catch(() => {})
+        .catch(() => { })
     }
     history.append({
       ...store.prompt,
@@ -914,7 +913,7 @@ export function Prompt(props: PromptProps) {
                     // Handle SVG as raw text content, not as base64 image
                     if (file.type === "image/svg+xml") {
                       event.preventDefault()
-                      const content = await file.text().catch(() => {})
+                      const content = await file.text().catch(() => { })
                       if (content) {
                         pasteText(content, `[SVG: ${file.name ?? "image"}]`)
                         return
@@ -925,7 +924,7 @@ export function Prompt(props: PromptProps) {
                       const content = await file
                         .arrayBuffer()
                         .then((buffer) => Buffer.from(buffer).toString("base64"))
-                        .catch(() => {})
+                        .catch(() => { })
                       if (content) {
                         await pasteImage({
                           filename: file.name,
@@ -935,7 +934,7 @@ export function Prompt(props: PromptProps) {
                         return
                       }
                     }
-                  } catch {}
+                  } catch { }
                 }
 
                 const lineCount = (pastedContent.match(/\n/g)?.length ?? 0) + 1
@@ -1010,13 +1009,13 @@ export function Prompt(props: PromptProps) {
             customBorderChars={
               theme.backgroundElement.a !== 0
                 ? {
-                    ...EmptyBorder,
-                    horizontal: "▀",
-                  }
+                  ...EmptyBorder,
+                  horizontal: "▀",
+                }
                 : {
-                    ...EmptyBorder,
-                    horizontal: " ",
-                  }
+                  ...EmptyBorder,
+                  horizontal: " ",
+                }
             }
           />
         </box>
