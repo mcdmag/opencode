@@ -383,7 +383,26 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
           if (store.status !== "complete") setStore("status", "partial")
           // non-blocking
           Promise.all([
-            ...(args.continue ? [] : [sessionListPromise.then((sessions) => setStore("session", reconcile(sessions)))]),
+            ...(args.continue ? [] : [sessionListPromise.then((sessions) => {
+              // [openralph] Preserve sessions that were individually synced (e.g. plugin-created)
+              // but may not yet appear in the session list response. reconcile() would evict them.
+              const syncedBefore = new Map<string, (typeof store.session)[number]>()
+              for (const id of fullSyncedSessions) {
+                const match = Binary.search(store.session, id, (s) => s.id)
+                if (match.found) syncedBefore.set(id, store.session[match.index])
+              }
+              setStore("session", reconcile(sessions))
+              // Re-insert any synced sessions that were evicted by reconcile
+              for (const [id, session] of syncedBefore) {
+                const check = Binary.search(store.session, id, (s) => s.id)
+                if (!check.found) {
+                  setStore("session", produce((draft) => {
+                    const insert = Binary.search(draft, id, (s) => s.id)
+                    draft.splice(insert.index, 0, session)
+                  }))
+                }
+              }
+            })]),
             sdk.client.command.list().then((x) => setStore("command", reconcile(x.data ?? []))),
             sdk.client.lsp.status().then((x) => setStore("lsp", reconcile(x.data!))),
             sdk.client.mcp.status().then((x) => setStore("mcp", reconcile(x.data!))),
