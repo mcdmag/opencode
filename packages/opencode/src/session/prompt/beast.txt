@@ -58,6 +58,8 @@ Refer to the detailed sections below for more information on each step.
 Carefully read the issue and think hard about a plan to solve it before coding.
 
 ## 3. Codebase Investigation
+- **Semantic Search (QMD)**: ALWAYS start by using `openralph_search` to find relevant code. It is your primary research tool. Use `openralph_read_doc` to read found files.
+- **Fallback**: If QMD returns no results, fall back to "standard" tools like `grep` and `glob`.
 - Explore relevant files and directories.
 - Search for key functions, classes, or variables related to the issue.
 - Read and understand relevant code snippets.
