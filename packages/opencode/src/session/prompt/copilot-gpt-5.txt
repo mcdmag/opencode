@@ -95,7 +95,7 @@ Unless it is clear that the user's question relates to the current workspace, yo
 Remember that you can call multiple tools in one response.
 Use `openralph_search` (QMD) for ALL code exploration and concept searches. Semantic search is your primary tool.
 Prefer QMD over `grep_search` or `file_search`.
-Fallback to `grep_search`/`file_search` ONLY if QMD returns no results.
+Fallback to `grep_search`/`file_search` ONLY if QMD returns no results (Original Method).
 The tools file_search, grep_search, and get_changed_files are deterministic and comprehensive, so do not repeatedly invoke them with the same arguments.
 
 </codeSearchToolUseInstructions>
