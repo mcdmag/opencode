@@ -513,7 +513,7 @@ function App() {
       title: "Open docs",
       value: "docs.open",
       onSelect: () => {
-        open("https://opencode.ai/docs").catch(() => { })
+        open("https://opencode.ai/docs").catch(() => {})
         dialog.clear()
       },
       category: "System",
@@ -640,7 +640,6 @@ function App() {
   })
 
   sdk.event.on(TuiEvent.SessionSelect.type, (evt) => {
-    try { require("fs").appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] SessionSelect: sessionID=${evt.properties.sessionID}\n`) } catch { }
     route.navigate({
       type: "session",
       sessionID: evt.properties.sessionID,

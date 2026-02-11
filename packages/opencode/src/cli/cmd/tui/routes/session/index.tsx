@@ -13,7 +13,6 @@ import {
 } from "solid-js"
 import { Dynamic } from "solid-js/web"
 import path from "path"
-import { appendFileSync } from "fs"
 import { useRoute, useRouteData } from "@tui/context/route"
 import { useSync } from "@tui/context/sync"
 import { SplitBorder } from "@tui/component/border"
@@ -83,13 +82,13 @@ import { UI } from "@/cli/ui.ts"
 addDefaultParsers(parsers.parsers)
 
 class CustomSpeedScroll implements ScrollAcceleration {
-  constructor(private speed: number) { }
+  constructor(private speed: number) {}
 
   tick(_now?: number): number {
     return this.speed
   }
 
-  reset(): void { }
+  reset(): void {}
 }
 
 const context = createContext<{
@@ -116,12 +115,7 @@ export function Session() {
   const kv = useKV()
   const { theme } = useTheme()
   const promptRef = usePromptRef()
-  try { appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] Session MOUNTED: sessionID=${route.sessionID}\n`) } catch { }
-  const session = createMemo(() => {
-    const s = sync.session.get(route.sessionID)
-    try { appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] session() memo: sessionID=${route.sessionID}, found=${!!s}, title=${s?.title ?? 'N/A'}\n`) } catch { }
-    return s
-  })
+  const session = createMemo(() => sync.session.get(route.sessionID))
   const children = createMemo(() => {
     const parentID = session()?.parentID ?? session()?.id
     return sync.data.session
@@ -181,16 +175,12 @@ export function Session() {
   })
 
   createEffect(async () => {
-    try { appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] sync.session.sync(${route.sessionID}) STARTING\n`) } catch { }
-    const syncStart = Date.now()
     await sync.session
       .sync(route.sessionID)
       .then(() => {
-        try { appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] sync.session.sync(${route.sessionID}) COMPLETED in ${Date.now() - syncStart}ms\n`) } catch { }
         if (scroll) scroll.scrollBy(100_000)
       })
       .catch((e) => {
-        try { appendFileSync("/tmp/openralph-debug.log", `[${new Date().toISOString()}] [TUI] sync.session.sync(${route.sessionID}) FAILED in ${Date.now() - syncStart}ms: ${e?.message}\n`) } catch { }
         console.error(e)
         toast.show({
           message: `Session not found: ${route.sessionID}`,
@@ -461,7 +451,7 @@ export function Session() {
       },
       onSelect: async (dialog) => {
         const status = sync.data.session_status?.[route.sessionID]
-        if (status?.type !== "idle") await sdk.client.session.abort({ sessionID: route.sessionID }).catch(() => { })
+        if (status?.type !== "idle") await sdk.client.session.abort({ sessionID: route.sessionID }).catch(() => {})
         const revert = session()?.revert?.messageID
         const message = messages().findLast((x) => (!revert || x.id < revert) && x.role === "user")
         if (!message) return

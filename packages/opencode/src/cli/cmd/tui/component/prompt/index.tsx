@@ -175,6 +175,7 @@ export function Prompt(props: PromptProps) {
         category: "Prompt",
         hidden: true,
         onSelect: (dialog) => {
+          if (!input.focused) return
           submit()
           dialog.clear()
         },
@@ -528,9 +529,9 @@ export function Prompt(props: PromptProps) {
     const sessionID = props.sessionID
       ? props.sessionID
       : await (async () => {
-        const sessionID = await sdk.client.session.create({}).then((x) => x.data!.id)
-        return sessionID
-      })()
+          const sessionID = await sdk.client.session.create({}).then((x) => x.data!.id)
+          return sessionID
+        })()
     const messageID = Identifier.ascending("message")
     let inputText = store.prompt.input
 
@@ -619,7 +620,7 @@ export function Prompt(props: PromptProps) {
             })),
           ],
         })
-        .catch(() => { })
+        .catch(() => {})
     }
     history.append({
       ...store.prompt,
@@ -633,27 +634,14 @@ export function Prompt(props: PromptProps) {
     setStore("extmarkToPartIndex", new Map())
     props.onSubmit?.()
 
-    // [openralph] Wait for session to sync before navigating to avoid blank screen.
-    // The original 50ms timeout navigated before the session was synced, causing a rendering stall.
-    if (!props.sessionID) {
-      const waitForSessionAndNavigate = async () => {
-        const maxWait = 5000
-        const interval = 100
-        let waited = 0
-        while (waited < maxWait) {
-          const sessions = sync.data.session
-          if (sessions?.some((s: { id: string }) => s.id === sessionID)) {
-            route.navigate({ type: "session", sessionID })
-            return
-          }
-          await new Promise(r => setTimeout(r, interval))
-          waited += interval
-        }
-        // Fallback: navigate anyway after max wait
-        route.navigate({ type: "session", sessionID })
-      }
-      waitForSessionAndNavigate()
-    }
+    // temporary hack to make sure the message is sent
+    if (!props.sessionID)
+      setTimeout(() => {
+        route.navigate({
+          type: "session",
+          sessionID,
+        })
+      }, 50)
     input.clear()
   }
   const exit = useExit()
@@ -926,7 +914,7 @@ export function Prompt(props: PromptProps) {
                     // Handle SVG as raw text content, not as base64 image
                     if (file.type === "image/svg+xml") {
                       event.preventDefault()
-                      const content = await file.text().catch(() => { })
+                      const content = await file.text().catch(() => {})
                       if (content) {
                         pasteText(content, `[SVG: ${file.name ?? "image"}]`)
                         return
@@ -937,7 +925,7 @@ export function Prompt(props: PromptProps) {
                       const content = await file
                         .arrayBuffer()
                         .then((buffer) => Buffer.from(buffer).toString("base64"))
-                        .catch(() => { })
+                        .catch(() => {})
                       if (content) {
                         await pasteImage({
                           filename: file.name,
@@ -947,7 +935,7 @@ export function Prompt(props: PromptProps) {
                         return
                       }
                     }
-                  } catch { }
+                  } catch {}
                 }
 
                 const lineCount = (pastedContent.match(/\n/g)?.length ?? 0) + 1
@@ -1022,13 +1010,13 @@ export function Prompt(props: PromptProps) {
             customBorderChars={
               theme.backgroundElement.a !== 0
                 ? {
-                  ...EmptyBorder,
-                  horizontal: "▀",
-                }
+                    ...EmptyBorder,
+                    horizontal: "▀",
+                  }
                 : {
-                  ...EmptyBorder,
-                  horizontal: " ",
-                }
+                    ...EmptyBorder,
+                    horizontal: " ",
+                  }
             }
           />
         </box>
