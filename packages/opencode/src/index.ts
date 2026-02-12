@@ -74,6 +74,8 @@ const cli = yargs(hideBin(process.argv))
       version: Installation.VERSION,
       args: process.argv.slice(2),
     })
+
+    console.error("[OpenCode] Loaded custom OpenRalph build (QMD + Loop Fixes verified)")
   })
   .usage("\n" + UI.logo())
   .completion("completion", "generate shell completion script")

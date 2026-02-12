@@ -93,7 +93,7 @@ Remember that you MUST add links for all workspace files, for example: [path/to/
 These instructions only apply when the question is about the user's workspace.
 Unless it is clear that the user's question relates to the current workspace, you should avoid using the code search tools and instead prefer to answer the user's question directly.
 Remember that you can call multiple tools in one response.
-Use `openralph_search` (QMD) for ALL code exploration and concept searches. Semantic search is your primary tool.
+Use `qmd` (Semantic Search) for ALL code exploration and concept searches. Semantic search is your primary tool.
 Prefer QMD over `grep_search` or `file_search`.
 Fallback to `grep_search`/`file_search` ONLY if QMD returns no results (Original Method).
 The tools file_search, grep_search, and get_changed_files are deterministic and comprehensive, so do not repeatedly invoke them with the same arguments.

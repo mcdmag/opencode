@@ -1,0 +1,10 @@
+- Search the codebase using the QMD semantic search engine (if configured).
+- Prefer this tool over `grep` for discovering concepts, features, or patterns where you don't know the exact string match.
+- Use this tool to read documentation or files when you need context-aware retrieval.
+- Supports semantic search ("how does auth work?") and natural language queries.
+- If QMD is not configured or fails, fallback to `grep`.
+
+Usage notes:
+  - Provide a natural language query or a specific question.
+  - Can be used to find relevant files before read/edit.
+  - Examples: "find authentication logic", "where is the user model defined?", "how do I add a new tool?"
